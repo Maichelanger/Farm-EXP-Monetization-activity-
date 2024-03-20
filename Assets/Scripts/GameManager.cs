@@ -7,20 +7,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI seedsText;
     [SerializeField] private GameObject noSeedsPanel;
 
+    internal bool showingRewarded = false;
+
+    private UnityAdsManager unityAdsManager;
     private int seeds = 6;
     private int seedsPlantedOnRound = 0;
-
     private string seedsTextString = "Semillas: ";
 
     private void Start()
     {
         seedsText.text = seedsTextString + seeds.ToString();
 
-        InitAds();
+        StartAdsService();
     }
 
     public void AddSeeds(int toAdd)
     {
+        showingRewarded = false;
+        noSeedsPanel.SetActive(false);
         seeds += toAdd;
         seedsText.text = seedsTextString + seeds.ToString();
     }
@@ -36,11 +40,13 @@ public class GameManager : MonoBehaviour
         if (seedsPlantedOnRound >= 6)
         {
             seedsPlantedOnRound = 0;
-            ShowInsterticial();
+            unityAdsManager.ShowNonRewardedAd();
+            unityAdsManager.LoadNonRewardedAd();
         }
 
         if (seeds <= 0)
         {
+            seedsPlantedOnRound = 0;
             noSeedsPanel.SetActive(true);
         }
     }
@@ -52,21 +58,18 @@ public class GameManager : MonoBehaviour
 
     //TODO: Add access to adverts
 
+    private void StartAdsService()
+    {
+        unityAdsManager = gameObject.AddComponent<UnityAdsManager>();
+        unityAdsManager.Initialize();
+        InitAds();
+    }
+
     private void InitAds()
     {
         //TODO
-        LoadInsterticial();
-        LoadRewarded();
-    }
-
-    private void LoadInsterticial()
-    {
-        //TODO
-    }
-
-    private void LoadRewarded()
-    {
-        //TODO
+        unityAdsManager.LoadNonRewardedAd();
+        unityAdsManager.LoadRewardedAd();
     }
 
     private void ShowInsterticial()
@@ -76,6 +79,6 @@ public class GameManager : MonoBehaviour
 
     public void ShowRewarded()
     {
-        //TODO
+        unityAdsManager.ShowRewardedAd();
     }
 }
